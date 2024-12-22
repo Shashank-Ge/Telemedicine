@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointments</title>
+    <link rel="stylesheet" href="doctor.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1>Telemedicine</h1>
+        <div>
+            <a href="doctor.html">Your Appointments</a>
+            <a href="index.html">Signout</a>
+        </div>
+    </div>
+
+    <!-- Welcome Text -->
+    <div class="welcome-text">
+        <h2>Pending Appointments</h2>
+    </div>
+
+    <!-- Appointments Section -->
+    <div class="appointments-section" id="appointments-section">
+        <!-- Dynamic content will be inserted here -->
+    </div>
+
+    <script>
+        // Function to fetch appointments and update the UI
+        async function fetchAppointments() {
+            try {
+                const response = await fetch('http://localhost:3006/api/appointments');
+                const appointments = await response.json();
+
+                const appointmentsSection = document.getElementById('appointments-section');
+                appointmentsSection.innerHTML = ''; // Clear any existing content
+
+                if (appointments.length === 0) {
+                    appointmentsSection.innerHTML = '<p>No appointments available.</p>';
+                } else {
+                    appointments.forEach(appointment => {
+                        const appointmentCard = document.createElement('div');
+                        appointmentCard.classList.add('appointment-card');
+                        appointmentCard.setAttribute('data-id', appointment._id);
+
+                        appointmentCard.innerHTML = `
+                            <h3>${appointment.patientName}</h3>
+                            <p><strong>Gender:</strong> ${appointment.gender}</p>
+                            <p><strong>Phone:</strong> ${appointment.phoneNo}</p>
+                            <p><strong>Description:</strong> ${appointment.description}</p>
+                            <p><strong>Appointment Date:</strong> ${new Date(appointment.appointmentDate).toLocaleString()}</p>
+                            <button class="confirm-button">Confirm</button>
+                        `;
+
+                        // Add event listener to the "Confirm" button
+                        appointmentCard.querySelector('.confirm-button').addEventListener('click', async () => {
+                            const confirmed = confirm('Are you sure you want to confirm this appointment?');
+                            if (!confirmed) return;
+
+                            const button = appointmentCard.querySelector('.confirm-button');
+                            button.disabled = true;
+                            button.textContent = 'Processing...';
+
+                            await confirmAppointment(appointment._id, appointmentCard, button);
+                        });
+
+                        appointmentsSection.appendChild(appointmentCard);
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching appointments:', error);
+            }
+        }
+
+        // Function to confirm (delete) an appointment
+        async function confirmAppointment(id, cardElement, button) {
+            try {
+                const response = await fetch(`http://localhost:3006/api/appointments/${id}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    console.log('Appointment deleted successfully');
+                    cardElement.remove(); // Remove the card from the DOM
+                } else {
+                    console.error('Error confirming appointment:', await response.text());
+                    alert('Failed to confirm appointment.');
+                    button.disabled = false;
+                    button.textContent = 'Confirm';
+                }
+            } catch (error) {
+                console.error('Error confirming appointment:', error);
+                button.disabled = false;
+                button.textContent = 'Confirm';
+            }
+        }
+
+        // Call fetchAppointments on page load
+        window.onload = fetchAppointments;
+    </script>
+    
+</body>
+</html>

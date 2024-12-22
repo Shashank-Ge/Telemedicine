@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment</title>
+    <link rel="stylesheet" href="appointment.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1>Telemedicine</h1>
+        <div>
+            <a href="AppointmentHome.html">Book an Appointment</a>
+      
+            <a href="index.html">Signout</a>
+        </div>
+    </div>
+
+    <!-- Welcome Text -->
+    <div class="welcome-text">
+        <h2>Welcome to Telemedicine</h2>
+    </div>
+
+    <!-- Main Content -->
+    <div class="signup-section">
+
+        <!-- Form -->
+        <div class="signup-right">
+            <h2>Book an Appointment</h2>
+            <form id="AppointmentForm">
+
+                <label for="Name-of-patient">Name of patient:</label>
+                <input type="text" id="Name-of-patient" name="Name-of-patient" required placeholder="Enter the Name of patient">
+
+                <label for="gender">Gender:</label>
+                <select id="gender" required name="gender">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+
+                <label for="patientNo.">Phone No.:</label>
+                <input type="number" id="patientNo." name="patientNo." required placeholder="Enter the Phone No. ">
+
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" placeholder="Provide a detailed description of the probelem and also add address detail"></textarea>
+
+                <button type="submit">Book</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- <button class="open-chat-btn" onclick="openChat()"='chatbot.html'">Open Chatbot</button> -->
+   
+    <!-- Footer Section -->
+    <div class="footer">
+        <p>&copy; 2024 ReStitch. All Rights Reserved.</p>
+    
+       
+    </div>
+    <script>
+        document.getElementById('AppointmentForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const patientName = document.getElementById('Name-of-patient').value;
+    const gender = document.getElementById('gender').value;
+    const phoneNo = document.getElementById('patientNo.').value;
+    const description = document.getElementById('description').value;
+
+    try {
+        const response = await fetch('http://localhost:3006/api/appointments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                patientName,
+                gender,
+                phoneNo,
+                description
+            }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert('Appointment booked successfully!');
+            // Optionally, you can reset the form here
+            document.getElementById('AppointmentForm').reset();
+        } else {
+            alert(data.message); // Show error message from the backend
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while booking the appointment. Please try again.');
+    }
+});
+    </script>
+</body>
+</html>

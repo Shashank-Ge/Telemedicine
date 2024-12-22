@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="signup.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1>Telemedicine</h1>
+        <div>
+            <a href="index.html">Home</a>
+            <a href="aboutUs.html">About Us</a>
+            <a href="login.html">Login</a>
+            <a href="signup.html">Sign Up</a>
+        </div>
+    </div>
+
+    <!-- Sign-Up Section -->
+    <div class="signup-section">
+        <div class="signup-right">
+            <h2>Sign Up</h2>
+            <form id="signup-form">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="fullName" required placeholder="Enter your full name">
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required placeholder="Enter your email">
+
+                <label for="user">Sign-Up As:</label>
+                <select id="user" required name="user">
+                    <option value="doctor">Doctor</option>
+                    <option value="patient">Patient</option>
+                </select>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required placeholder="Make a strong password">
+
+                <label for="confirmPassword">Confirm Password:</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirm your password">
+                
+                <button type="submit">Sign Up</button>
+            </form>
+
+            <!-- Response message -->
+            <div id="response-message"></div>
+
+            <div class="signup-link">
+                <p>Already a member? <a href="login.html">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="footer">
+        <p>&copy; 2024 Telemedicine. All Rights Reserved.</p>
+        <div class="social-media">
+            <a href="#" class="social-icon"><img src="#" alt="Facebook"> Facebook</a>
+            <a href="#" class="social-icon"><img src="#" alt="Instagram"> Instagram</a>
+            <a href="#" class="social-icon"><img src="#" alt="LinkedIn"> LinkedIn</a>
+        </div>
+    </div>
+
+    <!-- JavaScript to handle form submission -->
+    <script>
+        document.getElementById('signup-form').addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent form submission
+            
+            // Collect form data
+            const fullName = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const userType = document.getElementById('user').value;  // Added userType
+
+            // Prepare request payload
+            const userData = {
+                fullName,
+                email,
+                password,
+                confirmPassword,
+                userType
+            };
+
+            try {
+                // Send request to the API
+                const response = await fetch('http://localhost:3002/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData),
+                });
+
+                const data = await response.json();
+
+                // Display server response
+                const messageBox = document.getElementById('response-message');
+                if (response.ok) {
+                    // Redirect based on user type
+                    if (userType === "patient") {
+                        window.location.href = 'AppointmentHome.html';
+                    } else if (userType === "doctor") {
+                        window.location.href = 'doctor.html';
+                    }
+                } else {
+                    messageBox.textContent = data.message || 'Error occurred';
+                    messageBox.style.color = 'red';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                const messageBox = document.getElementById('response-message');
+                messageBox.textContent = 'Something went wrong. Please try again.';
+                messageBox.style.color = 'red';
+            }
+        });
+    </script>
+</body>
+</html>

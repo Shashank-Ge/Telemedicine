@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1>Telemedicine</h1>
+        <div>
+            <a href="index.html">Home</a>
+            <a href="aboutUs.html">About Us</a>
+            <a href="login.html">Login</a>
+            <a href="signup.html">Sign Up</a>
+        </div>
+    </div>
+
+    <!-- Login Section -->
+    <div class="signup-section">
+        <div class="signup-right">
+            <h2>Login</h2>
+            <form id="loginForm">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+               
+                <button type="submit" id="login">Login</button>
+            </form>
+            
+            <div class="signup-link">
+                <p>Not a member? <a href="signup.html">Sign Up</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2024 Telemedicine. All Rights Reserved.</p>
+        <div class="social-media">
+            <a href="#" class="social-icon"><img src="#" alt="Facebook"> Facebook</a>
+            <a href="#" class="social-icon"><img src="#" alt="Instagram"> Instagram</a>
+            <a href="#" class="social-icon"><img src="#" alt="LinkedIn"> LinkedIn</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent form refresh
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('http://localhost:3005/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    const userType = data.user.userType;  // Assuming userType is part of the response
+                    if (userType === 'doctor') {
+                        window.location.href = 'doctor.html'; // Redirect to doctor page
+                    } else if (userType === 'patient') {
+                        window.location.href = 'AppointmentHome.html'; // Redirect to patient page
+                    } else {
+                        alert('Unknown user type.');
+                    }
+                } else {
+                    alert(data.message); // Show error message
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>
